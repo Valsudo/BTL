@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Domains\Sale\Models\Traits\Relationship;
+
+use App\Domains\Category\Models\Category;
+use App\Domains\Product\Models\Product;
+use App\Domains\ProductSale\Models\ProductSale;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use App\Domains\ProductDetail\Models\ProductDetail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+trait SaleRelationship
+{
+    public function product(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, ProductSale::class);
+    }
+
+    public function productDetail(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductDetail::class, ProductSale::class);
+    }
+
+    public function category(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, ProductSale::class);
+    }
+
+    public function productThroghProductDetail(): HasManyDeep
+    {
+        return $this->hasManyDeep(
+            Product::class,
+            [ProductSale::class, ProductDetail::class],
+            ['sale_id', 'id', 'id'],
+            ['id', 'product_detail_id', 'product_id']
+        )->withPivot('name');
+    }
+
+    public function productSale()
+    {
+        return $this->hasMany(ProductSale::class);
+    }
+
+    public function syncProduct($product): void
+    {
+        $this->product()->sync($product);
+    }
+
+    public function syncProductWithCategory($categoryId, $product): void
+    {
+        $this->product()->sync([$product => [
+            'category_id' => $categoryId
+        ]]);
+    }
+
+    public function attachProduct($product): void
+    {
+        $this->product()->attach($product);
+    }
+
+    public function detachProduct($product): void
+    {
+        $this->product()->detach($product);
+    }
+
+    public function syncProductDetail($productDetail): void
+    {
+        $this->productDetail()->sync($productDetail);
+    }
+
+    public function attachProductDetail($productDetail): void
+    {
+        $this->productDetail()->attach($productDetail);
+    }
+
+    public function detachProductDetail($productDetail): void
+    {
+        $this->productDetail()->detach($productDetail);
+    }
+
+    public function syncProductDetailWithProductGlobal($categoryId, $productId, $productDetailId)
+    {
+        $this->productDetail()->sync([$productDetailId => [
+            'product_id' => $productId,
+            'category_id' => $categoryId
+        ]]);
+    }
+
+    public function syncCategory($category): void
+    {
+        $this->category()->sync($category);
+    }
+}
