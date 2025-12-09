@@ -1,0 +1,18 @@
+@import "../global";
+@import "global";
+
+// Variables
+@import 'variables';
+@import './color.scss';
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+@import '~jquery-ui/themes/base/all.css';
+
+@import './assets';
+
+@import './pages/login';
+@import './layouts/app';
+@import './pages/footer';
+@import './includes/';
+@import './pages/toggle-switch';
+
